@@ -11,21 +11,28 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Verify HTML file exists
-      run: |
-        if [ -f "index.html" ]; then
-          echo "✅ index.html found!"
-          echo "File size: $(wc -c < index.html) bytes"
-        else
-          echo "❌ index.html missing"
-          exit 1
-        fi
-    
-    - name: Create build artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: website-build
-        path: index.html
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: List files (debugging)
+        run: |
+          echo "Files in repository:"
+          ls -la
+      
+      - name: Verify HTML file exists
+        run: |
+          if [ -f "index.html" ]; then
+            echo "✅ index.html found!"
+            echo "File size: $(wc -c < index.html) bytes"
+          else
+            echo "❌ index.html not found"
+            echo "Current directory contents:"
+            ls -la
+            exit 1
+          fi
+      
+      - name: Create build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: website-build
+          path: index.html

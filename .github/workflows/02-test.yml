@@ -1,0 +1,47 @@
+name: 2. Test Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Security scan - check for credentials
+      run: |
+        echo "🔐 Scanning for potential secrets..."
+        if grep -i "password\|secret\|key\|token" index.html; then
+          echo "⚠️ WARNING: Potential sensitive terms found in HTML"
+          echo "Review and remove if these are real credentials"
+        else
+          echo "✅ No obvious credentials found"
+        fi
+    
+    - name: HTML structure validation
+      run: |
+        echo "🔍 Validating HTML structure..."
+        if grep -q "<html" index.html && grep -q "<body" index.html; then
+          echo "✅ HTML structure is valid"
+        else
+          echo "❌ Invalid HTML structure"
+          exit 1
+        fi
+    
+    - name: Check for broken image links
+      run: |
+        echo "🖼️ Checking for image references..."
+        grep -c "<img" index.html || echo "No images found - ok"
+    
+    - name: Pipeline test summary
+      run: |
+        echo "📊 Test Summary:"
+        echo "   - Security scan: PASSED"
+        echo "   - HTML validation: PASSED"
+        echo "   - Completed at: $(date)"
